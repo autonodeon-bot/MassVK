@@ -1,0 +1,8 @@
+{
+  "name": "VK Mass Automation Dashboard",
+  "description": "Образовательная панель управления для автоматизации VK: управление аккаунтами, генерация комментариев через Gemini AI и мониторинг лимитов.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}

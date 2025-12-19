@@ -8,6 +8,18 @@ export enum TaskStatus {
 
 export type AutomationStep = 'PROFILING' | 'SEARCHING' | 'SUBSCRIBING' | 'MONITORING' | 'CLIPS';
 
+export type AIProviderType = 'Gemini' | 'ChatGPT' | 'Grok' | 'DeepSeek';
+
+export interface AIAccount {
+  id: string;
+  name: string;
+  provider: AIProviderType;
+  apiKey: string;
+  model: string;
+  isActive: boolean;
+  usageCount: number;
+}
+
 export interface VKAccount {
   id: string;
   name: string;

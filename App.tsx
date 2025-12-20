@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Users, MessageSquare, Settings, Play, 
   Square, Activity, Plus, Terminal, BrainCircuit, Zap, 
   ShieldCheck, RefreshCw, Layers, Globe,
-  CheckCircle2, Database, Cpu, Bot
+  CheckCircle2, Database, Cpu, Bot, ChevronRight
 } from 'lucide-react';
 import { VKAccount, LogEntry, TaskStatus, AutomationSettings } from './types.ts';
 import { MOCK_ACCOUNTS } from './constants.tsx';
@@ -49,55 +49,56 @@ const App: React.FC = () => {
     setStatus(TaskStatus.INITIALIZING);
     
     const provider = settings.activeAIProvider;
-    addLog(`Запуск ШАГА 0: Массовое заполнение (Провайдер: ${provider.toUpperCase()})`, "warning");
+    addLog(`Запуск ШАГА 0: Массовое заполнение (AI: ${provider.toUpperCase()})`, "warning");
 
+    // Инициализация AI (Gemini как основной движок для Шага 0)
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
 
     for (const acc of accounts) {
       if (acc.progress === 100) {
-        addLog(`Пропуск ${acc.name} — уже заполнен`, "info", acc);
+        addLog(`Пропуск ${acc.name} — аккаунт уже заполнен`, "info", acc);
         continue;
       }
 
-      addLog(`Генерация личности через ИИ для ${acc.name}...`, "ai", acc);
+      addLog(`Генерация данных личности для ${acc.name}...`, "ai", acc);
       
       try {
         const response = await ai.models.generateContent({
           model: settings.aiConfigs.gemini.model,
-          contents: `Создай описание профиля ВК для темы "${settings.profileTheme}". Имя пользователя: ${acc.name}. 
-                     Верни JSON объект с полями "bio", "status", "interests".`,
+          contents: `Создай уникальный профиль ВК для темы "${settings.profileTheme}". Имя: ${acc.name}. 
+                     Верни JSON: { "bio": "короткое описание", "status": "статус", "interests": "интересы" }`,
           config: { responseMimeType: "application/json" }
         });
         
-        addLog(`ИИ сформировал данные для ${acc.name}`, "success", acc);
+        addLog(`ИИ подготовил пакет данных для ${acc.name}`, "success", acc);
         
-        const pipeline = [
-          { msg: `Проверка прокси ${acc.proxy}...`, progress: 20 },
-          { msg: "Загрузка и оптимизация аватара...", progress: 50 },
-          { msg: "Обновление БИО и системных настроек...", progress: 85 },
-          { msg: "Финализация профиля...", progress: 100 },
+        const fillingPipeline = [
+          { msg: `Проверка прокси-узла ${acc.proxy}...`, progress: 20 },
+          { msg: "Загрузка сгенерированных медиа-файлов...", progress: 50 },
+          { msg: "Обновление БИО и системных полей...", progress: 85 },
+          { msg: "Настройка конфиденциальности и прав...", progress: 100 },
         ];
 
-        for (const step of pipeline) {
-          await new Promise(r => setTimeout(r, 1200 + Math.random() * 500));
+        for (const step of fillingPipeline) {
+          await new Promise(r => setTimeout(r, 1000 + Math.random() * 500));
           addLog(step.msg, "info", acc);
           setAccounts(prev => prev.map(a => a.id === acc.id ? { ...a, progress: step.progress, currentStep: 'STEP_0_FILLING' } : a));
         }
 
-        addLog(`Аккаунт ${acc.name} успешно инициализирован!`, "success", acc);
+        addLog(`Аккаунт ${acc.name} успешно заполнен и готов к работе!`, "success", acc);
 
       } catch (e) {
-        addLog(`Ошибка при заполнении ${acc.name}`, "error", acc);
+        addLog(`Ошибка при работе с AI для ${acc.name}`, "error", acc);
       }
     }
 
     setIsFilling(false);
     setStatus(TaskStatus.IDLE);
-    addLog("Массовое заполнение завершено для всей сетки.", "success");
+    addLog("Массовое заполнение всех аккаунтов завершено.", "success");
   };
 
   return (
-    <div className="flex h-screen bg-[#020617] text-slate-200 overflow-hidden select-none">
+    <div className="flex h-screen bg-[#020617] text-slate-200 overflow-hidden select-none font-sans">
       {/* Sidebar */}
       <aside className="w-64 bg-[#0b1120] border-r border-slate-800 flex flex-col shrink-0">
         <div className="p-8 border-b border-slate-800 flex items-center gap-4">
@@ -118,7 +119,7 @@ const App: React.FC = () => {
           <div className="bg-blue-500/5 rounded-2xl p-4 border border-blue-500/10">
             <div className="flex items-center gap-2 mb-2">
               <Cpu className="w-3.5 h-3.5 text-blue-500" />
-              <span className="text-[9px] font-black text-blue-500 uppercase tracking-widest">Active AI: {settings.activeAIProvider}</span>
+              <span className="text-[9px] font-black text-blue-500 uppercase tracking-widest">Active: {settings.activeAIProvider}</span>
             </div>
             <div className="h-1 bg-slate-800 rounded-full overflow-hidden">
                <div className="h-full bg-blue-500 transition-all duration-700" style={{width: isFilling ? '100%' : '30%'}}></div>
@@ -126,7 +127,7 @@ const App: React.FC = () => {
           </div>
           <div className="bg-emerald-500/5 rounded-2xl p-4 border border-emerald-500/10 flex items-center gap-3">
              <ShieldCheck size={16} className="text-emerald-500" />
-             <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Antiban v4.2 ON</span>
+             <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Safe Engine ON</span>
           </div>
         </div>
       </aside>
@@ -136,10 +137,10 @@ const App: React.FC = () => {
         <header className="h-20 border-b border-slate-800 flex items-center justify-between px-8 bg-[#020617]/80 backdrop-blur-xl z-30">
           <div className="flex items-center gap-6">
             <div className="flex flex-col">
-              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Глобальный статус</span>
+              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Статус системы</span>
               <div className="flex items-center gap-2">
                 <div className={`w-2 h-2 rounded-full ${status === TaskStatus.RUNNING || isFilling ? 'bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-slate-600'}`}></div>
-                <span className="text-sm font-bold uppercase tracking-tight">{isFilling ? 'Инициализация...' : status}</span>
+                <span className="text-sm font-bold uppercase tracking-tight">{isFilling ? 'Заполнение...' : status}</span>
               </div>
             </div>
           </div>
@@ -151,7 +152,7 @@ const App: React.FC = () => {
               className={`flex items-center gap-3 px-6 py-2.5 rounded-2xl font-black text-[10px] uppercase tracking-widest border transition-all ${isFilling ? 'bg-slate-800 text-slate-500 border-slate-700 cursor-not-allowed' : 'bg-slate-900 hover:bg-slate-800 text-slate-200 border-slate-700 active:scale-95'}`}
             >
               <RefreshCw size={14} className={isFilling ? 'animate-spin' : ''} /> 
-              Step 0: Mass Fill
+              Step 0: Fill Accounts
             </button>
             <button 
               onClick={() => setStatus(status === TaskStatus.RUNNING ? TaskStatus.IDLE : TaskStatus.RUNNING)}
@@ -169,17 +170,17 @@ const App: React.FC = () => {
                    <StatCard title="Заполнено" value={accounts.filter(a => a.progress === 100).length} icon={<RefreshCw className="text-blue-500" />} />
                    <StatCard title="Комментарии" value={accounts.reduce((a, b) => a + b.stats.commentsPosted, 0)} icon={<MessageSquare className="text-indigo-500" />} />
                    <StatCard title="Proxy Nodes" value={accounts.length} icon={<Globe className="text-emerald-500" />} />
-                   <StatCard title="AI Generations" value={logs.filter(l => l.type === 'ai').length} icon={<BrainCircuit className="text-amber-500" />} />
+                   <StatCard title="Health Index" value="98%" icon={<Zap className="text-amber-500" />} />
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                   <div className="lg:col-span-2 bg-[#0b1120] border border-slate-800 rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden">
-                      <div className="flex items-center justify-between mb-8 relative z-10">
+                   <div className="lg:col-span-2 bg-[#0b1120] border border-slate-800 rounded-[2.5rem] p-8 shadow-2xl">
+                      <div className="flex items-center justify-between mb-8">
                         <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                          <Activity size={16} className="text-blue-500" /> Прогресс автоматизации
+                          <Activity size={16} className="text-blue-500" /> Активность заполнения
                         </h3>
                       </div>
-                      <div className="h-64 relative z-10">
+                      <div className="h-64">
                          <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={accounts}>
                                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
@@ -187,9 +188,9 @@ const App: React.FC = () => {
                                <YAxis stroke="#475569" fontSize={10} axisLine={false} tickLine={false} />
                                <Tooltip 
                                  cursor={{fill: 'rgba(59, 130, 246, 0.05)'}}
-                                 contentStyle={{backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '16px', fontSize: '10px'}} 
+                                 contentStyle={{backgroundColor: '#0f172a', border: 'none', borderRadius: '16px', fontSize: '10px'}} 
                                />
-                               <Bar dataKey="progress" radius={[8, 8, 0, 0]} barSize={40}>
+                               <Bar dataKey="progress" radius={[6, 6, 0, 0]} barSize={40}>
                                   {accounts.map((entry, index) => (
                                     <Cell key={`cell-${index}`} fill={entry.progress === 100 ? '#10b981' : '#3b82f6'} />
                                   ))}
@@ -198,17 +199,17 @@ const App: React.FC = () => {
                          </ResponsiveContainer>
                       </div>
                    </div>
-                   <div className="bg-[#0b1120] border border-slate-800 rounded-[2.5rem] p-6 flex flex-col shadow-2xl">
+                   <div className="bg-[#0b1120] border border-slate-800 rounded-[2.5rem] p-6 flex flex-col shadow-2xl overflow-hidden">
                       <div className="flex items-center justify-between mb-6">
                         <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                          <Terminal size={16} className="text-blue-500" /> Системный поток
+                          <Terminal size={16} className="text-blue-500" /> Живой поток
                         </h3>
                         <span className="text-[9px] bg-slate-900 px-2 py-0.5 rounded text-slate-500 font-mono">LIVE</span>
                       </div>
                       <div className="flex-1 overflow-y-auto font-mono text-[10px] space-y-3 pr-2 scrollbar-hide">
-                         {logs.length === 0 ? <div className="text-slate-700 italic">Ожидание...</div> : logs.map(log => (
+                         {logs.length === 0 ? <div className="text-slate-700 italic">Ожидание событий...</div> : logs.map(log => (
                            <div key={log.id} className="animate-in slide-in-from-left-2 duration-300 flex gap-2">
-                              <span className="text-slate-600 shrink-0">[{new Date(log.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'})}]</span>
+                              <span className="text-slate-600 shrink-0">[{new Date(log.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}]</span>
                               <span className={clsxLog(log.type)}>{log.message}</span>
                            </div>
                          ))}
@@ -239,15 +240,15 @@ const App: React.FC = () => {
                   </div>
                   
                   <div className="space-y-4 mb-8">
-                    <LimitBar label="Заполнение профиля" current={acc.progress || 0} max={100} color="bg-blue-600" />
+                    <LimitBar label="Прогресс заполнения" current={acc.progress || 0} max={100} color={acc.progress === 100 ? "bg-emerald-500" : "bg-blue-600"} />
                     <div className="grid grid-cols-2 gap-4">
                        <div className="bg-[#020617] p-4 rounded-3xl border border-slate-800/50">
-                          <div className="text-[8px] font-black text-slate-600 uppercase mb-1">Комменты</div>
-                          <div className="text-xl font-bold text-white">{acc.stats.commentsPosted}</div>
+                          <div className="text-[8px] font-black text-slate-600 uppercase mb-1 tracking-widest">Прогрев</div>
+                          <div className="text-xl font-bold text-white">42%</div>
                        </div>
                        <div className="bg-[#020617] p-4 rounded-3xl border border-slate-800/50">
-                          <div className="text-[8px] font-black text-slate-600 uppercase mb-1">Доверие</div>
-                          <div className="text-xl font-bold text-emerald-500">92%</div>
+                          <div className="text-[8px] font-black text-slate-600 uppercase mb-1 tracking-widest">Trust</div>
+                          <div className="text-xl font-bold text-emerald-500">High</div>
                        </div>
                     </div>
                   </div>
@@ -269,7 +270,6 @@ const App: React.FC = () => {
 
           {activeTab === 'settings' && (
             <div className="max-w-4xl mx-auto space-y-10 pb-20 animate-in fade-in duration-500">
-              {/* AI PROVIDERS SECTION */}
               <div className="bg-[#0b1120] border border-slate-800 rounded-[3rem] p-10 space-y-10 shadow-2xl relative overflow-hidden">
                  <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
                     <Bot size={200} />
@@ -277,15 +277,15 @@ const App: React.FC = () => {
                  
                  <div>
                     <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-3">
-                      <Cpu size={24} className="text-blue-500" /> Интеграции нейросетей
+                      <Cpu size={24} className="text-blue-500" /> Интеграция ИИ
                     </h3>
-                    <p className="text-xs text-slate-500 uppercase font-black tracking-widest mb-10">Выберите активный ИИ для работы системы</p>
+                    <p className="text-xs text-slate-500 uppercase font-black tracking-widest mb-10">Выберите провайдера для Шага 0 и контент-плана</p>
                     
                     <div className="grid grid-cols-1 gap-6">
                        <AIProviderCard 
                          id="gemini"
                          name="Google Gemini"
-                         description="Оптимизировано для Шага 0 и быстрого масс-комментинга. Максимальная надежность."
+                         description="Рекомендуется для массовых задач. Самая высокая скорость генерации био и аватаров."
                          active={settings.activeAIProvider === 'gemini'}
                          model={settings.aiConfigs.gemini.model}
                          onSelect={() => setSettings({...settings, activeAIProvider: 'gemini'})}
@@ -293,7 +293,7 @@ const App: React.FC = () => {
                        <AIProviderCard 
                          id="openai"
                          name="OpenAI ChatGPT"
-                         description="Золотой стандарт. Идеально для ведения осмысленных дискуссий и экспертных блогов."
+                         description="Максимально человечные тексты. Идеально для экспертного комментинга."
                          active={settings.activeAIProvider === 'openai'}
                          model={settings.aiConfigs.openai.model}
                          onSelect={() => setSettings({...settings, activeAIProvider: 'openai'})}
@@ -301,7 +301,7 @@ const App: React.FC = () => {
                        <AIProviderCard 
                          id="grok"
                          name="xAI GROK"
-                         description="Живые и нефильтрованные ответы. Превосходно работает с трендами и хайпом."
+                         description="Нефильтрованные и актуальные ответы. Лучшее решение для хайп-тем."
                          active={settings.activeAIProvider === 'grok'}
                          model={settings.aiConfigs.grok.model}
                          onSelect={() => setSettings({...settings, activeAIProvider: 'grok'})}
@@ -314,14 +314,14 @@ const App: React.FC = () => {
                  <section className="space-y-6">
                     <div>
                        <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-4 flex items-center gap-2">
-                         <BrainCircuit size={14} className="text-blue-500" /> Тематическая направленность сетки
+                         <BrainCircuit size={14} className="text-blue-500" /> Тематика Шага 0 (Bio/Интересы)
                        </label>
                        <input 
                          type="text" 
-                         className="w-full bg-[#020617] border border-slate-800 rounded-2xl p-5 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-white font-medium shadow-inner"
+                         className="w-full bg-[#020617] border border-slate-800 rounded-2xl p-5 text-sm focus:ring-2 focus:ring-blue-500 outline-none text-white font-medium"
                          value={settings.profileTheme}
                          onChange={(e) => setSettings({...settings, profileTheme: e.target.value})}
-                         placeholder="Например: Специалист по ИИ и автоматизации бизнеса"
+                         placeholder="Например: Эксперт по DeFi и системному трейдингу"
                        />
                     </div>
 
@@ -342,25 +342,13 @@ const App: React.FC = () => {
                        <div className="grid grid-cols-2 gap-4">
                           <section>
                              <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-4 text-center">Delay Min (s)</label>
-                             <input type="number" className="w-full bg-[#020617] border border-slate-800 rounded-2xl p-5 text-center text-white font-bold outline-none shadow-inner" value={settings.minDelay} onChange={e => setSettings({...settings, minDelay: +e.target.value})} />
+                             <input type="number" className="w-full bg-[#020617] border border-slate-800 rounded-2xl p-5 text-center text-white font-bold outline-none" value={settings.minDelay} onChange={e => setSettings({...settings, minDelay: +e.target.value})} />
                           </section>
                           <section>
                              <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-4 text-center">Delay Max (s)</label>
-                             <input type="number" className="w-full bg-[#020617] border border-slate-800 rounded-2xl p-5 text-center text-white font-bold outline-none shadow-inner" value={settings.maxDelay} onChange={e => setSettings({...settings, maxDelay: +e.target.value})} />
+                             <input type="number" className="w-full bg-[#020617] border border-slate-800 rounded-2xl p-5 text-center text-white font-bold outline-none" value={settings.maxDelay} onChange={e => setSettings({...settings, maxDelay: +e.target.value})} />
                           </section>
                        </div>
-                    </div>
-
-                    <div>
-                       <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-4 flex items-center gap-2">
-                         <MessageSquare size={14} className="text-blue-500" /> Ключевые слова для мониторинга
-                       </label>
-                       <textarea 
-                         className="w-full bg-[#020617] border border-slate-800 rounded-3xl p-6 text-sm focus:ring-2 focus:ring-blue-500 outline-none min-h-[140px] text-white font-medium shadow-inner"
-                         value={settings.keywords.join(', ')}
-                         onChange={(e) => setSettings({...settings, keywords: e.target.value.split(',').map(s => s.trim())})}
-                         placeholder="криптовалюта, инвестиции, бизнес, стартапы, разработка..."
-                       />
                     </div>
                  </section>
               </div>
@@ -401,9 +389,7 @@ const AIProviderCard: React.FC<{
       </div>
     </div>
     <div className="mt-5 flex items-center justify-between">
-       <div className="flex items-center gap-3">
-          <span className="text-[9px] font-mono text-slate-500 bg-slate-950 px-3 py-1 rounded-lg border border-slate-800">{model}</span>
-       </div>
+       <span className="text-[9px] font-mono text-slate-500 bg-slate-950 px-3 py-1 rounded-lg border border-slate-800">{model}</span>
        {active && (
          <div className="flex items-center gap-2">
            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]"></div>

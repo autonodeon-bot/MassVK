@@ -1,16 +1,21 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
+import App from './App.tsx';
 
-const rootElement = document.getElementById('root');
-if (!rootElement) {
-  throw new Error("Could not find root element to mount to");
+// Полифилл окружения до инициализации React приложения
+(window as any).process = (window as any).process || {};
+(window as any).process.env = (window as any).process.env || {};
+if (!(window as any).process.env.API_KEY) {
+  (window as any).process.env.API_KEY = (window as any).API_KEY || '';
 }
 
-const root = ReactDOM.createRoot(rootElement);
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+const rootElement = document.getElementById('root');
+if (rootElement) {
+  const root = ReactDOM.createRoot(rootElement);
+  root.render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  );
+}

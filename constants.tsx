@@ -1,5 +1,5 @@
 
-import { AIAccount } from './types';
+import { AIAccount, VKAccount } from './types.ts';
 
 export const VK_LIMITS = {
   FRIENDS_PER_DAY: 50,
@@ -38,7 +38,7 @@ export const MOCK_AI_ACCOUNTS: AIAccount[] = [
   }
 ];
 
-export const MOCK_ACCOUNTS: any[] = [
+export const MOCK_ACCOUNTS: VKAccount[] = [
   {
     id: 'acc_1',
     name: 'Ivan Tech',
@@ -47,6 +47,7 @@ export const MOCK_ACCOUNTS: any[] = [
     token: 'vk_access_token_1',
     proxy: '185.12.33.11:3128',
     currentStep: 'IDLE',
+    progress: 0,
     stats: { friendsAdded: 14, groupsJoined: 8, commentsPosted: 42, clipsCommented: 12 },
     limits: { friends: 50, groups: 40, comments: 100 }
   },
@@ -58,6 +59,7 @@ export const MOCK_ACCOUNTS: any[] = [
     token: 'vk_access_token_2',
     proxy: '45.155.203.1:8000',
     currentStep: 'IDLE',
+    progress: 0,
     stats: { friendsAdded: 5, groupsJoined: 2, commentsPosted: 15, clipsCommented: 3 },
     limits: { friends: 50, groups: 40, comments: 100 }
   }

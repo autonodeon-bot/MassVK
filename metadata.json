@@ -1,6 +1,6 @@
 {
-  "name": "VK Mass Automation Dashboard",
-  "description": "Образовательная панель управления для автоматизации VK: управление аккаунтами, генерация комментариев через Gemini AI и мониторинг лимитов.",
+  "name": "MassVK AI Automation",
+  "description": "Профессиональная панель для масс-фолловинга и масс-комментинга ВКонтакте с использованием ИИ Gemini.",
   "requestFramePermissions": [
     "camera",
     "microphone"

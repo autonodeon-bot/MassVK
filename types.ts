@@ -2,25 +2,24 @@
 export enum TaskStatus {
   IDLE = 'IDLE',
   RUNNING = 'RUNNING',
-  PAUSED = 'PAUSED',
+  INITIALIZING = 'INITIALIZING',
   ERROR = 'ERROR'
 }
 
-export type AutomationStep = 'PROFILING' | 'SEARCHING' | 'SUBSCRIBING' | 'MONITORING' | 'CLIPS';
+export type AutomationStep = 'IDLE' | 'STEP_0_FILLING' | 'PROFILING' | 'SEARCHING' | 'SUBSCRIBING' | 'MONITORING' | 'CLIPS';
 
-export type AIProviderType = 'Gemini' | 'ChatGPT' | 'Grok' | 'DeepSeek';
-
-export interface AIAccount {
+// Интерфейс для AI аккаунтов (Gemini, DeepSeek и др.)
+export type AIAccount = {
   id: string;
   name: string;
-  provider: AIProviderType;
+  provider: string;
   apiKey: string;
   model: string;
   isActive: boolean;
   usageCount: number;
-}
+};
 
-export interface VKAccount {
+export type VKAccount = {
   id: string;
   name: string;
   avatar: string;
@@ -28,18 +27,20 @@ export interface VKAccount {
   token: string;
   proxy: string;
   currentStep: AutomationStep;
+  progress: number;
   stats: {
     friendsAdded: number;
     groupsJoined: number;
     commentsPosted: number;
     clipsCommented: number;
   };
+  // Лимиты для безопасной автоматизации
   limits: {
     friends: number;
     groups: number;
     comments: number;
   };
-}
+};
 
 export interface LogEntry {
   id: string;
@@ -55,6 +56,5 @@ export interface AutomationSettings {
   commentTemplate: string;
   minDelay: number;
   maxDelay: number;
-  onlyClosed: boolean;
-  autoRepost: boolean;
+  profileTheme: string;
 }

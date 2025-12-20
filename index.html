@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VK Mass Automation Pro | Step 0</title>
+    <title>VK Mass Automation | Professional AI Tools</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="importmap">
 {
@@ -38,18 +38,17 @@
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         
-        @keyframes border-glow {
-            0% { border-color: rgba(59, 130, 246, 0.2); }
-            50% { border-color: rgba(59, 130, 246, 0.8); }
-            100% { border-color: rgba(59, 130, 246, 0.2); }
-        }
-        .animate-glow { animation: border-glow 2s infinite; }
-        
         .glass-panel {
             background: rgba(15, 23, 42, 0.6);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(51, 65, 85, 0.5);
         }
+        
+        @keyframes pulse-soft {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .animate-pulse-soft { animation: pulse-soft 3s infinite; }
     </style>
 </head>
 <body class="min-h-screen overflow-hidden">

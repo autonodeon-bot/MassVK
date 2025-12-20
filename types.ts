@@ -6,14 +6,14 @@ export enum TaskStatus {
   ERROR = 'ERROR'
 }
 
+export type AIProviderId = 'gemini' | 'openai' | 'grok';
+
 export type AutomationStep = 'IDLE' | 'STEP_0_FILLING' | 'PROFILING' | 'SEARCHING' | 'SUBSCRIBING' | 'MONITORING' | 'CLIPS';
 
-// Интерфейс для AI аккаунтов (Gemini, DeepSeek и др.)
 export type AIAccount = {
-  id: string;
+  id: AIProviderId;
   name: string;
   provider: string;
-  apiKey: string;
   model: string;
   isActive: boolean;
   usageCount: number;
@@ -34,7 +34,6 @@ export type VKAccount = {
     commentsPosted: number;
     clipsCommented: number;
   };
-  // Лимиты для безопасной автоматизации
   limits: {
     friends: number;
     groups: number;
@@ -57,4 +56,9 @@ export interface AutomationSettings {
   minDelay: number;
   maxDelay: number;
   profileTheme: string;
+  activeAIProvider: AIProviderId;
+  aiConfigs: Record<AIProviderId, {
+    model: string;
+    enabled: boolean;
+  }>;
 }

@@ -10,28 +10,28 @@ export const VK_LIMITS = {
 
 export const MOCK_AI_ACCOUNTS: AIAccount[] = [
   {
-    id: 'ai_1',
+    // Исправлено: ID теперь соответствует типу AIProviderId
+    id: 'gemini',
     name: 'Основной Gemini',
     provider: 'Gemini',
-    apiKey: '***',
     model: 'gemini-3-flash-preview',
     isActive: true,
     usageCount: 145
   },
   {
-    id: 'ai_2',
-    name: 'DeepSeek Pro',
-    provider: 'DeepSeek',
-    apiKey: '***',
-    model: 'deepseek-chat',
+    // Исправлено: ID теперь соответствует типу AIProviderId
+    id: 'openai',
+    name: 'OpenAI Pro',
+    provider: 'OpenAI',
+    model: 'gpt-4o',
     isActive: false,
     usageCount: 12
   },
   {
-    id: 'ai_3',
+    // Исправлено: ID теперь соответствует типу AIProviderId
+    id: 'grok',
     name: 'Grok-1.0',
     provider: 'Grok',
-    apiKey: '***',
     model: 'grok-beta',
     isActive: false,
     usageCount: 0

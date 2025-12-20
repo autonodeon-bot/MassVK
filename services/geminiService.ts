@@ -3,17 +3,15 @@ import { GoogleGenAI } from "@google/genai";
 
 // Функция для генерации живых комментариев к постам ВКонтакте
 export const generateVKComment = async (postContent: string, keywords: string[], template: string): Promise<string> => {
-  // Ключ API берется исключительно из process.env.API_KEY
-  const apiKey = process.env.API_KEY;
-  
-  if (!apiKey) {
+  // Ключ API берется исключительно из переменной окружения
+  if (!process.env.API_KEY) {
     console.error("API_KEY is missing. Using fallback comment.");
     return getRandomDefaultComment();
   }
 
   try {
-    // Инициализация клиента Gemini с передачей ключа в объекте параметров
-    const ai = new GoogleGenAI({ apiKey });
+    // Инициализация клиента Gemini с прямой передачей ключа
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
@@ -23,11 +21,11 @@ export const generateVKComment = async (postContent: string, keywords: string[],
                  Без хэштегов, не более 140 символов.`,
       config: {
         systemInstruction: "Ты — активный пользователь ВКонтакте. Твои комментарии живые, человечные и короткие. Используй смайлики в тему.",
-        temperature: 0.9,
+        temperature: 1,
       }
     });
 
-    // Извлечение текста напрямую из свойства .text (не метод)
+    // Извлечение текста напрямую из свойства .text
     return response.text || getRandomDefaultComment();
   } catch (error) {
     console.error("Gemini API Error:", error);
